@@ -22,7 +22,7 @@ def posts_get():
 	posts = posts.all()
 
 	data = json.dumps([post.as_dictionary() for post in posts])
-	return Response(data, 200, "application/mimetype")
+	return Response(data, 200, mimetype="application/mimetype")
 
 """
 Endpoint for getting a post with a specifi id

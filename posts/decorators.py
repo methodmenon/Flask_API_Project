@@ -7,7 +7,7 @@ def accept(mimetype):
 	def decorator(func):
 		@wraps(func)
 		def wrapper(*args, **kwargs):
-			if mimetype in request.args.mimetypes:
+			if mimetype in request.accept_mimetypes:
 				return func(*args, **kwargs)
 			message = "Response must accept {} data".format(mimetype)
 			data = json.dumps({"message": message})

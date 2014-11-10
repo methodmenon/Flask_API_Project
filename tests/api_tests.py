@@ -39,7 +39,7 @@ class TestAPI(unittest.TestCase):
         """getting posts from a populated database"""
         postA = models.Post(title="Example Post A", body="Just a test")
         postB = models.Post(title="Example Post B", body="Still a test")
-        session.add_all([PostA, PostB])
+        session.add_all([postA, postB])
         session.commit()
 
         response = self.client.get("/api/posts")
@@ -67,7 +67,7 @@ class TestAPI(unittest.TestCase):
         response = self.client.post("/api/posts",
             data=json.dumps(data),
             content_type="application/json",
-            headers=(["Accept", "application/json"])
+            headers=[("Accept", "application/json")]
             )
 
         self.assertEqual(response.status_code, 201)
@@ -94,7 +94,7 @@ class TestAPI(unittest.TestCase):
         session.add_all([postA, postB])
         session.commit()
 
-        response = self.client.get("/api/posts/{id}".format(postB.id))
+        response = self.client.get("/api/posts/{}".format(postB.id))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, "application/json")
@@ -141,7 +141,7 @@ class TestAPI(unittest.TestCase):
 
     def testUnsupportedAcceptHeader(self):
         response = self.client.get("/api/posts", 
-            headers=(["Accept", "application/xml"])
+            headers=[("Accept", "application/xml")]
             )
 
         self.assertEqual(response.status_code, 406)
@@ -159,7 +159,7 @@ class TestAPI(unittest.TestCase):
         resonse = self.client.post("/api/posts",
             data=json.dumps(data),
             content_type="application/json",
-            headers=(["Accept", "application/json"])
+            headers=[("Accept", "application/json")]
             )
 
         self.assertEqual(respon.status_code, 422)
@@ -175,7 +175,7 @@ class TestAPI(unittest.TestCase):
         response = self.client.post("/api/posts",
             data=json.dumps(data),
             content_type="application/json",
-            headers=(["Accept", "application/json"])
+            headers=[("Accept", "application/json")]
             )
 
         self.assertEqual(response.status_code, 422)
