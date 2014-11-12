@@ -134,7 +134,26 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(post["title"], "Post with green eggs and ham")
         self.assertEqual(post["body"], "Another test")
 
+    def testGetPostWithTitleAndBody(self):
+        postA = models.Post(title="Post with green eggs", body="We have eggs")
+        postB = models.Post(title="Post with ham", body="We have eggs")
+        postC = models.Post(title="Post with green eggs and ham", body="Another test")
+        session.add_all([postA, postB, postC])
+        session.commit()
 
+        response = self.client.get("/api/posts?title_like=ham&body_like=eggs",
+            headers=[("Accept", "application/json")]
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, "application/json")
+
+        posts = json.loads(response.data)
+        self.assertEqual(len(posts), 1)
+
+        post = post[0]
+        self.assertEqual(post["title"], "Post with ham")
+        self.assertEqual(post["body"], "We have eggs")
 
     def testGetNonExistentPost(self):
         response = self.client.get("/api/posts/1",

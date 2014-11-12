@@ -9,19 +9,22 @@ from posts import app
 from database import session
 
 """
-Endpoint for getting a posts , optionally filtering by title
+Endpoint for getting a posts , optionally filtering by title and/or body
 """
 @app.route("/api/posts", methods=["GET"])
 @decorators.accept("application/json")
 def posts_get():
 	title_like = request.args.get("title_like")
+	body_like = request.args.get("body_like")
 
 	posts = session.query(models.Post)
 	if title_like:
 		posts = posts.filter(models.Post.title.contains(title_like))
+		if body_like:
+			posts = posts.filter(models.Post.body.contains(body_like))
 	posts = posts.all()
 
-	data = json.dumps([post.as_dictionary() for post in posts])
+	data = json.dumps(post.as_dictionary() for post in posts)
 	return Response(data, 200, mimetype="application/json")
 
 """
