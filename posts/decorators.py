@@ -9,7 +9,7 @@ def accept(mimetype):
 		def wrapper(*args, **kwargs):
 			if mimetype in request.accept_mimetypes:
 				return func(*args, **kwargs)
-			message = "Response must accept {} data".format(mimetype)
+			message = "Request must accept {} data".format(mimetype)
 			data = json.dumps({"message": message})
 			return Response(data, 406, mimetype="application/json")
 		return wrapper

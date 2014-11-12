@@ -22,7 +22,7 @@ def posts_get():
 	posts = posts.all()
 
 	data = json.dumps([post.as_dictionary() for post in posts])
-	return Response(data, 200, mimetype="application/mimetype")
+	return Response(data, 200, mimetype="application/json")
 
 """
 Endpoint for getting a post with a specifi id
@@ -35,10 +35,10 @@ def post_get(id):
 	if not post:
 		message = "Could not find post with id {}".format(id)
 		data = json.dumps({"message": message})
-		return Response(data, 404, "application/json")
+		return Response(data, 404, mimetype="application/json")
 
 	data = json.dumps(post.as_dictionary())
-	return Response(data, 200, "application/json")
+	return Response(data, 200, mimetype="application/json")
 
 post_schema = {
 	"properties": {
@@ -61,7 +61,7 @@ def posts_post():
 		validate(data, post_schema)
 	except ValidationError as error:
 		data = {"message": error.message}
-		return Response(json.dumps(data), 422, "application/json")
+		return Response(json.dumps(data), 422, mimetype="application/json")
 
 	post = models.Post(title=data["title"], body=data["body"])
 	session.add(post)
@@ -70,6 +70,6 @@ def posts_post():
 	data = json.dumps(post.as_dictionary())
 	headers = {"Location": url_for("post_get", id=post.id)}
 
-	return Response(data, 200, headers=headers, mimetype="application/json")
+	return Response(data, 201, headers=headers, mimetype="application/json")
 
 	
