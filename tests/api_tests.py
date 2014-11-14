@@ -151,7 +151,7 @@ class TestAPI(unittest.TestCase):
         posts = json.loads(response.data)
         self.assertEqual(len(posts), 1)
 
-        post = post[0]
+        post = posts
         self.assertEqual(post["title"], "Post with ham")
         self.assertEqual(post["body"], "We have eggs")
 

@@ -2,6 +2,7 @@ import json
 
 from flask import request, Response, url_for
 from jsonschema import validate, ValidationError
+from sqlalchemy import and_, or_
 
 import models
 import decorators
@@ -19,9 +20,10 @@ def posts_get():
 
 	posts = session.query(models.Post)
 	if title_like:
-		posts = posts.filter(models.Post.title.contains(title_like))
 		if body_like:
-			posts = posts.filter(models.Post.body.contains(body_like))
+			posts = posts.filter((models.Post.title.contains(title_like), models.Post.body.contains(body_like)))
+		else:
+			posts = posts.filter(models.Post.title.contains(title_like))
 	posts = posts.all()
 
 	data = json.dumps(post.as_dictionary() for post in posts)
