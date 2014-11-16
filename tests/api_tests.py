@@ -24,18 +24,6 @@ class TestAPI(unittest.TestCase):
         """ Test teardown """
         # Remove the tables and their data from the database
         Base.metadata.drop_all(engine)
-    """
-    replaced this test with the one below 
-
-    def testGetEmptyPosts(self):
-        response = self.client.get("/api/posts")
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.mimetype, "application/json")
-
-        data = json.loads(response.data)
-        self.assertEqual(data, [])
-    """
 
     def testGetPosts(self):
         """getting posts from a populated database"""
@@ -134,6 +122,31 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(post["title"], "Post with green eggs and ham")
         self.assertEqual(post["body"], "Another test")
 
+    def testGetPostWithBody(self):
+        postA = models.Post(title="Post with green eggs", body="We have eggs")
+        postB = models.Post(title="Post with ham", body="We have eggs")
+        postC = models.Post(title="Post with green eggs and ham", body="Another test")
+        session.add_all([postA, postB, postC])
+        session.commit()
+
+        response = self.client.get("/api/posts?body_like=ham",
+            headers=[("Accept", "application/json")]
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, "application/json")
+
+        posts = json.loads(response.data)
+        self.assertEqual(len(posts), 2)
+
+        post = post[0]
+        self.assertEqual(post["title"], "Post with ham")
+        self.assertEqual(post["body"], "We have eggs")
+
+        post = post[1]
+        self.assertEqual(post["title"], "Post with green eggs and ham")
+        self.assertEqual(post["body"], "Another test")
+
     def testGetPostWithTitleAndBody(self):
         postA = models.Post(title="Post with green eggs", body="We have eggs")
         postB = models.Post(title="Post with ham", body="We have eggs")
@@ -151,7 +164,7 @@ class TestAPI(unittest.TestCase):
         posts = json.loads(response.data)
         self.assertEqual(len(posts), 1)
 
-        post = posts
+        post = posts[0]
         self.assertEqual(post["title"], "Post with ham")
         self.assertEqual(post["body"], "We have eggs")
 
