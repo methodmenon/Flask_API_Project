@@ -26,7 +26,7 @@ def posts_get():
 			posts = posts.filter(models.Post.title.contains(title_like))
 	posts = posts.all()
 
-	data = json.dumps(post.as_dictionary() for post in posts)
+	data = json.dumps([post.as_dictionary() for post in posts])
 	return Response(data, 200, mimetype="application/json")
 
 """
