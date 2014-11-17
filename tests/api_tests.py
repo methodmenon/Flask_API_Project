@@ -51,6 +51,8 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(postB["body"], "Still a test")
 
     def testPostPost(self):
+        """A test for adding a post"""
+
         data = {
             "title": "Example Post",
             "body": "Just a test"
@@ -79,6 +81,28 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(post.title, "Example Post")
         self.assertEqual(post.body, "Just a test")
 
+##################################################################################
+
+    def testPostPostToId(self):
+        """editing a post at a specific id"""
+        dataUpdateA = {
+            "title": "Updated Post A",
+            "body": "Updated just a test"
+            }
+
+        dataUpdateB + {
+            "title": "Updated Post B",
+            "body": "Updated just a test"
+        }
+
+        postA = models.Post(title="Example Post A", body="Just a test")
+        postB = models.Post(title="Example Post B", body="Still a test")
+        session.add_all([postA, postB])
+        session.commit()
+
+################################################################################
+
+
     def testGetPost(self):
         postA = models.Post(title="Example Post A", body="Just a test")
         postB = models.Post(title="Example Post B", body="Still a test")
@@ -96,6 +120,8 @@ class TestAPI(unittest.TestCase):
         data = json.loads(response.data)
         self.assertEqual(data["title"], "Example Post B")
         self.assertEqual(data["body"], "Still a test")
+
+
 
     def testGetPostsWithTitle(self):
         postA = models.Post(title="Post with green eggs", body="Just a test")

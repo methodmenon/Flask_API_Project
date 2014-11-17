@@ -14,6 +14,7 @@ Endpoint for getting a posts , optionally filtering by title and/or body
 """
 @app.route("/api/posts", methods=["GET"])
 @decorators.accept("application/json")
+@decorators.require("application/json")
 def posts_get():
 	title_like = request.args.get("title_like")
 	body_like = request.args.get("body_like")
@@ -34,6 +35,7 @@ Endpoint for getting a post with a specifi id
 """
 @app.route("/api/posts/<int:id>", methods=["GET"])
 @decorators.accept("application/json")
+@decorators.require("application/json")
 def post_get(id):
 	post = session.query(models.Post).get(id)
 
