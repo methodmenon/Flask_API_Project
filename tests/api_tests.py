@@ -85,20 +85,49 @@ class TestAPI(unittest.TestCase):
 
     def testPostPostToId(self):
         """editing a post at a specific id"""
-        dataUpdateA = {
-            "title": "Updated Post A",
-            "body": "Updated just a test"
-            }
-
-        dataUpdateB + {
+        
+        dataUpdateB = {
             "title": "Updated Post B",
-            "body": "Updated just a test"
+            "body": "Updated test for post B"
         }
 
-        postA = models.Post(title="Example Post A", body="Just a test")
-        postB = models.Post(title="Example Post B", body="Still a test")
-        session.add_all([postA, postB])
+        #postA = models.Post(title="Example Post A", body="Test for post A")
+        postB = models.Post(id=2, title="Example Post B", body="Test for post B")
+        #postC = models.Post(title="Example Post C", body="Test for post C")
+        session.add(postB)
         session.commit()
+
+        response = self.client.post("/api/posts/{}".format(postB.id),
+            data=json.dumps(dataUpdateB),
+            content_type="application/json",
+            #headers=[("Accept", "application/json")]
+            )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.mimetype, "application/json")
+        self.assertEqual(urlparse(response.headers.get("Location")).path, "/api/posts/2")
+
+        data = json.dumps(response.data)
+        self.assertEqual(data["id"], 2)
+        self.assertEqual(data["title"], "Updated Post B")
+        self.assertEqual(data["body"], "Update test for post B")
+
+        posts = session.query(models.Post).all()
+        self.assertEqual(len(posts), 1)
+
+        """
+        post = posts[0]
+        self.assertEqual(post.id, 1)
+        self.assertEqual(post.title, "Example Post A")
+        self.assertEqual(post.body, "Test for post A")
+        """
+
+        post = posts[0]
+        self.assertEqual(post.id, 2)
+        self.assertEqual(post.title, "Updated Post B")
+        self.assertEqual(post.body, "Updated test for post B")
+
+
 
 ################################################################################
 

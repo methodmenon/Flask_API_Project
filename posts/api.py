@@ -79,4 +79,27 @@ def posts_post():
 
 	return Response(data, 201, headers=headers, mimetype="application/json")
 
-	
+"""
+Endpoint for adding a post to a specific post id
+"""
+@app.route("/api/posts/<int:post_id>", methods=["POST"])
+@decorators.accept("application/json")
+@decorators.require("application/json")
+def post_post(post_id):
+	post = session.query(models.Post).filter(models.Post.id==post_id).first()
+
+	data = request.json
+
+	try:
+		validate(data, post_schema)
+	except ValidationError as error:
+		data = {"message": error.message}
+		return Response(data, 422, mimetype="application/json" )
+
+	post.title = data["title"]
+	post.body = data["body"]
+	session.commit()
+
+
+	data = json.dumps(post.as_dictionary())
+	return Response(data, 201, headers=headers, mimetype="application/json")
