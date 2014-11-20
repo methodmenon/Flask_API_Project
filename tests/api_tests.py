@@ -100,7 +100,7 @@ class TestAPI(unittest.TestCase):
         response = self.client.post("/api/posts/{}".format(postB.id),
             data=json.dumps(dataUpdateB),
             content_type="application/json",
-            #headers=[("Accept", "application/json")]
+            headers=[("Accept", "application/json")]
             )
 
         self.assertEqual(response.status_code, 201)
@@ -133,6 +133,7 @@ class TestAPI(unittest.TestCase):
 
 
     def testGetPost(self):
+        """Getting a single post from a populated database"""
         postA = models.Post(title="Example Post A", body="Just a test")
         postB = models.Post(title="Example Post B", body="Still a test")
 
@@ -153,6 +154,7 @@ class TestAPI(unittest.TestCase):
 
 
     def testGetPostsWithTitle(self):
+        """Filtering posts by title"""
         postA = models.Post(title="Post with green eggs", body="Just a test")
         postB = models.Post(title="Post with ham", body="Still a test")
         postC = models.Post(title="Post with green eggs and ham", body="Another test")
@@ -178,13 +180,14 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(post["body"], "Another test")
 
     def testGetPostWithBody(self):
+        """Filtering posts by body"""
         postA = models.Post(title="Post with green eggs", body="We have eggs")
         postB = models.Post(title="Post with ham", body="We have eggs")
         postC = models.Post(title="Post with green eggs and ham", body="Another test")
         session.add_all([postA, postB, postC])
         session.commit()
 
-        response = self.client.get("/api/posts?body_like=ham",
+        response = self.client.get("/api/posts?body_like=eggs",
             headers=[("Accept", "application/json")]
             )
 
@@ -203,6 +206,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(post["body"], "Another test")
 
     def testGetPostWithTitleAndBody(self):
+        """Filtering posts by title and body"""
         postA = models.Post(title="Post with green eggs", body="We have eggs")
         postB = models.Post(title="Post with ham", body="We have eggs")
         postC = models.Post(title="Post with green eggs and ham", body="Another test")
@@ -224,6 +228,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(post["body"], "We have eggs")
 
     def testGetNonExistentPost(self):
+        """Getting a single post which does not exist"""
         response = self.client.get("/api/posts/1",
             headers=[("Accept", "application/json")]
             )
@@ -246,6 +251,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(data["message"], "Request must accept application/json data")
 
     def testInvalidData(self):
+        """Posting a post with an invalid body"""
         data = {
             "title": "Example Post",
             "body": 32
@@ -263,6 +269,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(data["message"], "32 is not of type 'string'")
 
     def testMissingData(self):
+        """ Posting a post with a missing body """
         data = {
             "title": "Example Post",
         }
@@ -279,6 +286,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(data["message"], "'body' is a required property")
 
     def testUnsupportedMimetype(self):
+        """Test for ensuring client sends data that the server understands"""
         data="<xml></xml>"
         response = self.client.post("/api/posts",
             data=json.dumps(data),
