@@ -22,10 +22,10 @@ def posts_get():
 
     posts = session.query(models.Post)
     if title_like:
-        if body_like:
-            posts = posts.filter((models.Post.title.contains(title_like), models.Post.body.contains(body_like)))
-        else:
-            posts = posts.filter(models.Post.title.contains(title_like))
+        posts = posts.filter(models.Post.title.contains(title_like))
+    if body_like:
+        posts = posts.filter(models.Post.body.contains(body_like))
+    
     posts = posts.all()
 
     data = json.dumps([post.as_dictionary() for post in posts])
@@ -103,4 +103,6 @@ def post_post(post_id):
 
 
     data = json.dumps(post.as_dictionary())
+    headers = {"Location": url_for("post_get", id=post_id)}
+
     return Response(data, 201, headers=headers, mimetype="application/json")

@@ -91,14 +91,14 @@ class TestAPI(unittest.TestCase):
             "body": "Updated test for post B"
         }
 
-        #postA = models.Post(title="Example Post A", body="Test for post A")
-        postB = models.Post(id=2, title="Example Post B", body="Test for post B")
-        #postC = models.Post(title="Example Post C", body="Test for post C")
-        session.add(postB)
+        postA = models.Post(title="Example Post A", body="Test for post A")
+        postB = models.Post(title="Example Post B", body="Test for post B")
+        postC = models.Post(title="Example Post C", body="Test for post C")
+        session.add_all([postA, postB, postC])
         session.commit()
 
         response = self.client.post("/api/posts/{}".format(postB.id),
-            data=json.dumps(dataUpdateB),
+            data=json.dumps({postB.title: dataUpdateB["title"], postB.body: dataUpdateB["body"]}),
             content_type="application/json",
             headers=[("Accept", "application/json")]
             )
@@ -112,7 +112,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(data["title"], "Updated Post B")
         self.assertEqual(data["body"], "Update test for post B")
 
-        posts = session.query(models.Post).all()
+        posts = session.query(models.Post).filter(Post.id == 2)
         self.assertEqual(len(posts), 1)
 
         """
@@ -197,13 +197,13 @@ class TestAPI(unittest.TestCase):
         posts = json.loads(response.data)
         self.assertEqual(len(posts), 2)
 
-        post = post[0]
-        self.assertEqual(post["title"], "Post with ham")
+        post = posts[0]
+        self.assertEqual(post["title"], "Post with green eggs")
         self.assertEqual(post["body"], "We have eggs")
 
-        post = post[1]
-        self.assertEqual(post["title"], "Post with green eggs and ham")
-        self.assertEqual(post["body"], "Another test")
+        post = posts[1]
+        self.assertEqual(post["title"], "Post with ham")
+        self.assertEqual(post["body"], "We have eggs")
 
     def testGetPostWithTitleAndBody(self):
         """Filtering posts by title and body"""
