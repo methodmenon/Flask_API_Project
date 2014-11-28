@@ -2,7 +2,7 @@ import unittest
 import os
 import json
 from urlparse import urlparse
-#yaml to convert unicode to strings
+
 
 
 # Configure our app to use the testing databse
@@ -108,15 +108,12 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(urlparse(response.headers.get("Location")).path, "/api/posts/2")
 
         data = json.loads(response.data)
-        data = yaml.load(data)
-        print data
-        #self.assertEqual(data[0], 2)
-        #self.assertEqual(data[1], "Updated Post B")
-        self.assertEqual(data["body"], "Update test for post B")
+        self.assertEqual(data["id"], 2)
+        self.assertEqual(data["title"], "Updated Post B")
+        self.assertEqual(data["body"], "Updated test for post B")
 
 
-
-        posts = session.query(models.Post).filter(Post.id == 2)
+        posts = session.query(models.Post).filter(models.Post.id == 2).all()
         self.assertEqual(len(posts), 1)
 
 
