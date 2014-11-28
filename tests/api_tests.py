@@ -2,6 +2,8 @@ import unittest
 import os
 import json
 from urlparse import urlparse
+#yaml to convert unicode to strings
+
 
 # Configure our app to use the testing databse
 os.environ["CONFIG_PATH"] = "posts.config.TestingConfig"
@@ -81,14 +83,12 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(post.title, "Example Post")
         self.assertEqual(post.body, "Just a test")
 
-##################################################################################
-
     def testPostPostToId(self):
-        """editing a post at a specific id"""
+        #editing a post at a specific id
         
         dataUpdateB = {
-            "title": "Updated Post B",
-            "body": "Updated test for post B"
+            'title': 'Updated Post B',
+            'body': 'Updated test for post B'
         }
 
         postA = models.Post(title="Example Post A", body="Test for post A")
@@ -98,7 +98,7 @@ class TestAPI(unittest.TestCase):
         session.commit()
 
         response = self.client.post("/api/posts/{}".format(postB.id),
-            data=json.dumps({postB.title: dataUpdateB["title"], postB.body: dataUpdateB["body"]}),
+            data=json.dumps(dataUpdateB).decode('unicode-escape').encode('utf8'),
             content_type="application/json",
             headers=[("Accept", "application/json")]
             )
@@ -107,30 +107,23 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.mimetype, "application/json")
         self.assertEqual(urlparse(response.headers.get("Location")).path, "/api/posts/2")
 
-        data = json.dumps(response.data)
-        self.assertEqual(data["id"], 2)
-        self.assertEqual(data["title"], "Updated Post B")
+        data = json.loads(response.data)
+        data = yaml.load(data)
+        print data
+        #self.assertEqual(data[0], 2)
+        #self.assertEqual(data[1], "Updated Post B")
         self.assertEqual(data["body"], "Update test for post B")
+
+
 
         posts = session.query(models.Post).filter(Post.id == 2)
         self.assertEqual(len(posts), 1)
 
-        """
-        post = posts[0]
-        self.assertEqual(post.id, 1)
-        self.assertEqual(post.title, "Example Post A")
-        self.assertEqual(post.body, "Test for post A")
-        """
 
         post = posts[0]
         self.assertEqual(post.id, 2)
         self.assertEqual(post.title, "Updated Post B")
         self.assertEqual(post.body, "Updated test for post B")
-
-
-
-################################################################################
-
 
     def testGetPost(self):
         """Getting a single post from a populated database"""
@@ -150,8 +143,6 @@ class TestAPI(unittest.TestCase):
         data = json.loads(response.data)
         self.assertEqual(data["title"], "Example Post B")
         self.assertEqual(data["body"], "Still a test")
-
-
 
     def testGetPostsWithTitle(self):
         """Filtering posts by title"""
