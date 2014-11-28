@@ -98,7 +98,7 @@ class TestAPI(unittest.TestCase):
         session.commit()
 
         response = self.client.post("/api/posts/{}".format(postB.id),
-            data=json.dumps(dataUpdateB).decode('unicode-escape').encode('utf8'),
+            data=json.dumps({"title":"Updated Post B", "body":"Updated test for post B"}),
             content_type="application/json",
             headers=[("Accept", "application/json")]
             )
@@ -108,12 +108,24 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(urlparse(response.headers.get("Location")).path, "/api/posts/2")
 
         data = json.loads(response.data)
+<<<<<<< HEAD
         self.assertEqual(data["id"], 2)
         self.assertEqual(data["title"], "Updated Post B")
         self.assertEqual(data["body"], "Updated test for post B")
 
 
         posts = session.query(models.Post).filter(models.Post.id == 2).all()
+=======
+        print data
+        #self.assertEqual(data[0], 2)
+        #self.assertEqual(data[1], "Updated Post B")
+        self.assertEqual(data["body"], "Updated test for post B")
+
+
+
+        posts = session.query(models.Post).filter(models.Post.id == 2)
+        posts = posts.all()
+>>>>>>> f89b876c238fb40a77c26a031036e2aeb172d690
         self.assertEqual(len(posts), 1)
 
 
