@@ -108,31 +108,20 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(urlparse(response.headers.get("Location")).path, "/api/posts/2")
 
         data = json.loads(response.data)
-<<<<<<< HEAD
+        print data 
         self.assertEqual(data["id"], 2)
         self.assertEqual(data["title"], "Updated Post B")
         self.assertEqual(data["body"], "Updated test for post B")
 
-
         posts = session.query(models.Post).filter(models.Post.id == 2).all()
-=======
         print data
-        #self.assertEqual(data[0], 2)
-        #self.assertEqual(data[1], "Updated Post B")
-        self.assertEqual(data["body"], "Updated test for post B")
-
-
-
-        posts = session.query(models.Post).filter(models.Post.id == 2)
-        posts = posts.all()
->>>>>>> f89b876c238fb40a77c26a031036e2aeb172d690
         self.assertEqual(len(posts), 1)
 
 
         post = posts[0]
         self.assertEqual(post.id, 2)
         self.assertEqual(post.title, "Updated Post B")
-        #self.assertEqual(post.body, "Updated test for post B")
+        self.assertEqual(post.body, "Updated test for post B")
 
     def testGetPost(self):
         """Getting a single post from a populated database"""
